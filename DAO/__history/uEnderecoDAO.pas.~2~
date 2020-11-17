@@ -1,0 +1,27 @@
+unit uEnderecoDAO;
+
+interface
+uses uDAO, uEndereco;
+
+type
+  TEnderecoDAO = class (TconectDAO)
+    public
+    Constructor Create;
+    Destructor Destroy; override;
+  end;
+
+implementation
+
+{ TEnderecoDAO }
+
+constructor TEnderecoDAO.Create;
+begin
+  inherited;
+end;
+
+destructor TEnderecoDAO.Destroy;
+begin
+  inherited;
+end;
+
+end.

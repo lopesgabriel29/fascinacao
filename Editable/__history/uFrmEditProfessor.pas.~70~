@@ -1,0 +1,217 @@
+unit uFrmEditProfessor;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
+  Vcl.CheckLst, Vcl.Buttons, Vcl.Mask, Vcl.ExtCtrls, uProfessor, uProfessorDAO,
+  uEndereco,
+  uEnderecoDAO, uCursoDAO, FireDac.comp.client;
+
+type
+  TFrmEditProfessor = class(TForm)
+    pCadProfessor: TPanel;
+    pInfo: TPanel;
+    Label2: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    Label15: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    Label18: TLabel;
+    EdtContato: TEdit;
+    EdtCpf: TMaskEdit;
+    EdtRg: TMaskEdit;
+    EdtNome: TEdit;
+    DTDataNasc: TDateTimePicker;
+    EdtEmail: TEdit;
+    EdtCnpj: TMaskEdit;
+    pEndereçoProfessor: TPanel;
+    Label3: TLabel;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
+    Label23: TLabel;
+    EdtRua: TEdit;
+    EdtNumero: TEdit;
+    EdtCidade: TEdit;
+    EdtBairro: TEdit;
+    MECep: TMaskEdit;
+    pCursos: TPanel;
+    Label1: TLabel;
+    BtnEditar: TSpeedButton;
+    BtnClose: TSpeedButton;
+    CLCursos: TCheckListBox;
+    pHorario: TPanel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    EdtDiaHorario: TComboBox;
+    DTInicio: TDateTimePicker;
+    DTFim: TDateTimePicker;
+    LVHorario: TListView;
+    BtnCadHorario: TButton;
+    ScrollBar: TScrollBar;
+    procedure FormCreate(Sender: TObject);
+    procedure ScrollBarChange(Sender: TObject);
+    procedure BtnCloseClick(Sender: TObject);
+    procedure BtnEditarClick(Sender: TObject);
+    procedure BtnSaveClick(Sender: TObject);
+  private
+    procedure CriaLista(pQuery: TFDQuery; pProfessor : TProfessor);
+    procedure onlyread;
+    procedure editable;
+  public
+    procedure PreencherEditProfessor(pProfessor: TProfessor);
+  end;
+
+var
+  FrmEditProfessor: TFrmEditProfessor;
+  Professor: TProfessor;
+  professorDAO: TProfessorDAO;
+  endereco: TEndereco;
+  enderecoDAO: TEnderecoDAO;
+  cursoDAO: TCursoDAO;
+
+implementation
+
+{$R *.dfm}
+{ TFrmEditProfessor }
+
+procedure TFrmEditProfessor.BtnEditarClick(Sender: TObject);
+begin
+  Editable;
+  BtnEditar.Caption := 'Salvar';
+  BtnEditar.OnClick := BtnSaveClick(Sender: TObject);
+end;
+
+procedure TFrmEditProfessor.BtnSaveClick(Sender: TObject);
+begin
+//save edits
+
+  onlyread;
+  BtnEditar.Caption := 'Editar';
+  BtnEditar.OnClick := BtnEditarClick(Sender: TObject);
+
+end;
+
+procedure TFrmEditProfessor.BtnCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFrmEditProfessor.CriaLista(pQuery: TFDQuery; pProfessor : TProfessor);
+var
+  I, count: integer;
+begin
+  count := 0;
+  CLCursos.Clear;
+  while not pQuery.Eof do
+  begin
+    CLCursos.Items.Add(pQuery.FieldByName('nome').AsString);
+    pQuery.Next;
+  end;
+
+  for I := 0 to CLCursos.Items.count - 1 do
+  begin
+    for count := 0 to pProfessor.Tamanho-1 do
+    begin
+      if pProfessor.Cursos[count] = CLCursos.Items[I] then
+      CLCursos.State[I] := cbChecked;
+    end;
+  end;
+end;
+
+procedure TFrmEditProfessor.editable;
+begin
+  EdtContato.ReadOnly := False;
+  EdtCpf.ReadOnly := False;
+  EdtRg.ReadOnly := False;
+  EdtNome.ReadOnly := False;
+  EdtEmail.ReadOnly := False;
+  EdtCnpj.ReadOnly := False;
+  EdtRua.ReadOnly := False;
+  EdtNumero.ReadOnly := False;
+  EdtCidade.ReadOnly := False;
+  EdtBairro.ReadOnly := False;
+  MECep.ReadOnly := False;
+  EdtDiaHorario.Enabled := True;
+  DTDataNasc.Enabled := True;
+  DTInicio.Enabled := True;
+  DTFim.Enabled := True;
+  CLCursos.Enabled := True;
+end;
+
+procedure TFrmEditProfessor.FormCreate(Sender: TObject);
+begin
+  left := (Screen.Width - Width) div 2;
+  top := (Screen.Height - Height) div 2;
+
+  pCadProfessor.Height := 0;
+  pCadProfessor.Height := pInfo.Height + pHorario.Height + pEndereçoProfessor.Height
+    + pCursos.Height;
+  ScrollBar.Max := pCadProfessor.Height - FrmEditProfessor.Height;
+
+  Professor := TProfessor.Create;
+  professorDAO := TProfessorDAO.Create;
+  endereco := Tendereco.Create;
+  enderecoDAO := TenderecoDAO.Create;
+  cursoDAO := TCursoDAO.Create;
+
+  onlyread;
+end;
+
+procedure TFrmEditProfessor.onlyread;
+begin
+  EdtContato.ReadOnly := True;
+  EdtCpf.ReadOnly := True;
+  EdtRg.ReadOnly := True;
+  EdtNome.ReadOnly := True;
+  EdtEmail.ReadOnly := True;
+  EdtCnpj.ReadOnly := True;
+  EdtRua.ReadOnly := True;
+  EdtNumero.ReadOnly := True;
+  EdtCidade.ReadOnly := True;
+  EdtBairro.ReadOnly := True;
+  EdtDiaHorario.Enabled := false;
+  MECep.ReadOnly := True;
+  DTDataNasc.Enabled := false;
+  DTInicio.Enabled := false;
+  DTFim.Enabled := false;
+  CLCursos.Enabled := false;
+end;
+
+procedure TFrmEditProfessor.PreencherEditProfessor(pProfessor: TProfessor);
+begin
+  Professor := pProfessor;
+  EdtNome.Text := pProfessor.Nome;
+  EdtContato.Text := pProfessor.Contato;
+  EdtCpf.Text := pProfessor.Cpf;
+  EdtRg.Text := pProfessor.RG;
+  EdtEmail.Text := pProfessor.Email;
+  EdtCnpj.Text := pProfessor.CNPJ;
+  DTDataNasc.DateTime := pProfessor.DataNasc;
+
+  endereco := enderecoDAO.RetornarEndereco(pProfessor.ID);
+
+  EdtRua.Text := endereco.Rua;
+  EdtNumero.Text := IntToStr(endereco.Numero);
+  EdtBairro.Text := endereco.Bairro;
+  EdtCidade.Text := endereco.Bairro;
+  MECep.Text := endereco.Cep;
+
+  CriaLista(cursoDAO.ListaCurso, pProfessor);
+end;
+
+procedure TFrmEditProfessor.ScrollBarChange(Sender: TObject);
+begin
+  pCadProfessor.top := -ScrollBar.Position;
+end;
+
+end.

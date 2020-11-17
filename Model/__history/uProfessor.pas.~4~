@@ -1,0 +1,25 @@
+unit uProfessor;
+
+interface
+
+uses system.sysUtils;
+
+type
+  TProfessor = class
+  private
+    FID: integer;
+    FNome: String;
+    Fid_endereco: integer;
+    FidResponsavel: integer;
+    FDataNasc: TDateTime;
+    FCpf: string;
+    FRG: string;
+    FCNPJ: string;
+    FContato: String;
+    FEmail: string;
+  public
+  end;
+
+implementation
+
+end.

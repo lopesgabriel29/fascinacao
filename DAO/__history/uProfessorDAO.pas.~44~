@@ -1,0 +1,81 @@
+unit uProfessorDAO;
+
+interface
+
+uses system.SysUtils, uDAO, uProfessor, uEndereco;
+
+type
+  TProfessorDAO = class(TconectDAO)
+  public
+    Constructor Create;
+    Destructor Destroy; override;
+    function CadastrarProfessor(pProfessor: TProfessor;
+      pEndereco: TEndereco): boolean;
+    function CadastrarProfessor_Curso(pProfessor: TProfessor): boolean;
+
+  end;
+
+implementation
+
+{ TProfessorDAO }
+
+function TProfessorDAO.CadastrarProfessor(pProfessor: TProfessor;
+  pEndereco: TEndereco): boolean;
+var
+  SQL: string;
+begin
+
+  SQL := 'SELECT id_endereco FROM ENDERECO WHERE CEP = ' +
+    QuotedSTR(pEndereco.cep) + ' AND numero = ' +
+    QuotedSTR(InttoStr(pEndereco.Numero)) + 'limit 1';
+
+  FQuery := RetornarDataSet(SQL);
+
+  pEndereco.id := FQuery.fieldByName('id_endereco').AsInteger;
+
+  SQL := 'INSERT INTO professor VALUES(default, ' + QuotedSTR(pProfessor.Nome) +
+    ', ' + QuotedSTR(InttoStr(pEndereco.id)) + ', ' +
+    QuotedSTR(FormatDateTime('dd/mm/yyyy', pProfessor.DataNasc)) + ', ' +
+    QuotedSTR(pProfessor.Cpf) + ', ' + QuotedSTR(pProfessor.rg) + ', ' +
+    QuotedSTR(pProfessor.CNPJ) + ', ' + QuotedSTR(pProfessor.contato) + ', ' +
+    QuotedSTR(pProfessor.email) + ')';
+
+  result := executarComando(SQL) > 0;
+end;
+
+function TProfessorDAO.CadastrarProfessor_Curso(pProfessor: TProfessor)
+  : boolean;
+var
+  I: integer;
+  SQL: string;
+begin
+  for I := 0 to pProfessor.Tamanho - 1 do
+    if pProfessor.Cursos[I] <> '' then
+    begin
+      SQL := 'SELECT id_Professor FROM professor WHERE cpf = ' + QuotedStr(pProfessor.Cpf);
+      FQuery := RetornarDataSet(SQL);
+      pProfessor.ID := FQuery.FieldByName('id_professor').AsInteger;
+
+      SQL := 'SELECT id_curso FROM curso WHERE nome = ' + QuotedStr(pProfessor.Cursos[I]);
+      FQuery := RetornarDataSet(SQL);
+      pProfessor.ID := FQuery.FieldByName('id_professor').AsInteger;
+
+
+
+      SQL := 'INSERT INTO professor_curso VALUES (' ;
+    end;
+
+end;
+
+constructor TProfessorDAO.Create;
+begin
+  inherited;
+end;
+
+destructor TProfessorDAO.Destroy;
+begin
+
+  inherited;
+end;
+
+end.

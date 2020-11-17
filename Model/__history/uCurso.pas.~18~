@@ -1,0 +1,31 @@
+unit uCurso;
+
+interface
+
+uses sysUtils;
+
+type
+  TCurso = class
+  private
+    FID: integer;
+    FNome: string;
+    FPreço: currency;
+    FSala1: string;
+    FSala2: string;
+    FSala3: string;
+    FSala4: string;
+    FSala5: string;
+  public
+    property ID: integer read FID write FID;
+    property Nome: string read FNome write FNome;
+    property Preco: currency Read FPreço write FPreço;
+    property sala1: string read FSala1 write FSala1;
+    property sala2: string read FSala2 write FSala2;
+    property sala3: string read FSala3 write FSala3;
+    property sala4: string read FSala4 write FSala4;
+    property sala5: string read FSala5 write FSala5;
+  end;
+
+implementation
+
+end.

@@ -1,0 +1,22 @@
+unit uPessoa;
+
+interface
+
+type
+  TAdm = class
+  private
+    FID: integer;
+    FNome: string;
+    FLogin: string;
+    FPassw: string;
+
+    function GetID: integer;
+  public
+    property IdAdm: integer read GetID write SetID;
+    property NomeAdm : string read GetNome write SetNome;
+
+  end;
+
+implementation
+
+end.

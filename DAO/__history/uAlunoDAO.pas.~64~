@@ -1,0 +1,107 @@
+unit uAlunoDAO;
+
+interface
+
+uses uDAO, uAluno, system.generics.collections, FireDAC.Comp.Client, DB,
+  system.sysUtils, uEndereco;
+
+type
+  TAlunoDAO = class(TConectDAO)
+  protected
+    FListaAluno: TobjectList<TAluno>;
+    procedure preencherlista(Ds: TFDQuery);
+  public
+    Constructor Create;
+    Destructor Destroy; override;
+    function CadastrarAluno(pAluno: TAluno; pEndereco: TEndereco): boolean;
+    function CadastrarEndereco(pEndereco: TEndereco): boolean;
+
+  end;
+
+implementation
+
+{ TAlunoDAO }
+
+function TAlunoDAO.CadastrarAluno(pAluno: TAluno; pEndereco: TEndereco)
+  : boolean;
+var
+  SQL: string;
+begin
+  SQL := 'SELECT id_endereco FROM ENDERECO WHERE CEP = ' + QuotedSTR(pEndereco.cep) +
+  ' AND numero ' + QuotedStr(InttoStr(pEndereco.numero)) + 'limit 1';
+
+  FQuery := RetornarDataSet(SQL);
+
+  pEndereco.id :=  FQuery.fieldByName('id_endereco').AsInteger;
+
+  SQL := 'INSERT INTO aluno VALUES(default, ' +
+  QuotedStr(inttostr(pEndereco.id)) + ', null,' +
+  QuotedStr(pAluno.Nome) + ', ' +
+  QuotedStr(pAluno.Cpf) + ', ' +
+  QuotedStr(pAluno.rg) + ', ' +
+  QuotedStr(FormatDateTime('dd/mm/yyyy', pAluno.Datanasc)) + ', ' +
+  QuotedStr(pAluno.contato) + ', ' +
+  QuotedStr(pAluno.email) + ', ' +
+  QuotedStr(pAluno.contatocom) + ')';
+
+  result := executarComando(SQL) > 0;
+end;
+
+function TAlunoDAO.CadastrarEndereco(pEndereco: TEndereco): boolean;
+var SQL : string;
+begin
+  SQL := 'INSERT INTO endereco VALUES(defalut, ' + QuotedStr(pEndereco.cidade) + ', ' +
+  QuotedStr(pEndereco.bairro) + ', ' +
+  QuotedStr(pEndereco.rua) + ', '+
+  QuotedStr(IntToStr(pEndereco.numero)) + ', '+
+  QuotedStr(pEndereco.cep) + ')';
+
+  result := ExecutarComando(SQL) > 0;
+end;
+
+constructor TAlunoDAO.Create;
+begin
+  inherited;
+  FListaAluno := TobjectList<TAluno>.Create;
+end;
+
+destructor TAlunoDAO.Destroy;
+begin
+  try
+    inherited;
+
+    if Assigned(FListaAluno) then
+      FreeAndNil(FListaAluno);
+
+  except
+    on e: exception do
+      raise exception.Create(e.Message);
+  end;
+end;
+
+procedure TAlunoDAO.preencherlista(Ds: TFDQuery);
+var
+  I: integer;
+begin
+
+  I := 0;
+  FListaAluno.Clear;
+
+  while not Ds.eof do
+  begin
+    FListaAluno.Add(TAluno.Create);
+    FListaAluno[I].id := Ds.FieldByName('idlembrete').AsInteger;
+    FListaAluno[I].Nome := Ds.FieldByName('titulo').AsString;
+    FListaAluno[I].Cpf := Ds.FieldByName('descricao').AsString;
+    FListaAluno[I].rg := Ds.FieldByName('datahora').AsString;
+    FListaAluno[I].Datanasc := Ds.FieldByName('datahora').AsDateTime;
+    FListaAluno[I].contato := Ds.FieldByName('datahora').AsString;
+    FListaAluno[I].email := Ds.FieldByName('datahora').AsString;
+    FListaAluno[I].IDResponsavel := Ds.FieldByName('datahora').AsInteger;
+
+    Ds.Next;
+    I := I + 1;
+  end;
+end;
+
+end.

@@ -1,0 +1,48 @@
+unit uCursoDAO;
+
+interface
+
+uses uDAO, uCurso, FireDAC.Comp.Client, sysUtils;
+
+type
+  TCursoDAO = class(TconectDAO)
+  public
+    Constructor Create;
+    Destructor Destroy; override;
+    function ListaCurso: TFDQuery;
+    function CadastraCurso(pCurso :Tcurso):boolean;
+  end;
+
+implementation
+
+{ TCursoDAO }
+
+function TCursoDAO.CadastraCurso(pCurso: Tcurso): boolean;
+var SQL:string;
+begin
+   SQL := 'insert into curso values (default, ' + QuotedSTR(pcurso.nome) + ', '+
+   QuotedStr(FloatToStr(pCurso.Preco)) + ')';
+
+   Result := ExecutarComando(SQL)>0;
+end;
+
+constructor TCursoDAO.Create;
+begin
+  inherited;
+end;
+
+destructor TCursoDAO.Destroy;
+begin
+  inherited;
+end;
+
+function TCursoDAO.ListaCurso: TFDQuery;
+var SQL : string;
+begin
+  SQL := 'SELECT nome FROM curso';
+  FQuery := RetornarDataSet(SQL);
+
+  Result := FQuery;
+end;
+
+end.

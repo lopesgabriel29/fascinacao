@@ -1,0 +1,28 @@
+unit uPessoa;
+
+interface
+
+type
+  TAdm = class
+  private
+    FID: integer;
+    FNome: string;
+    FLogin: string;
+    FPassw: string;
+
+    function GetID: integer;
+    procedure SetID(value: integer);
+
+    function GetNome:string;
+    procedure SetNome(value :String);
+  public
+    property IdAdm: integer read GetID write SetID;
+    property NomeAdm : string read GetNome write SetNome;
+    property LoginAdm : string read GetLogin write SetLogin;
+    property PasswAdm : string read GetPassw write SetPassw;
+
+  end;
+
+implementation
+
+end.
